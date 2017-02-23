@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# Author: Eduardo Kamioka - ekamioka\n\n# Testing some simple linear regression (initially achieved the same score as using random forest )\n\n# train <- read.csv(\"../input/train.csv\", header = T)\n# test <- read.csv(\"../input/test.csv\", header = T)\n# store <- read.csv(\"../input/store.csv\")\n\ntrain <- read.csv(\"train.csv\", header = T)\ntest <- read.csv(\"test.csv\", header = T)\nstore <- read.csv(\"store.csv\")\n\ntrain <- merge(train,store)\ntest <- merge(test,store)\n\najeita_pa_mim <- function(dt){\n        \n        # replacing NA's by the mean value  \n        dt$CompetitionDistance[is.na(dt$CompetitionDistance)] = round(mean(dt$CompetitionDistance, na.rm = T))\n        dt$CompetitionOpenSinceMonth[is.na(dt$CompetitionOpenSinceMonth)] = round(mean(dt$CompetitionOpenSinceMonth, na.rm = T))\n        dt$CompetitionOpenSinceYear[is.na(dt$CompetitionOpenSinceYear)] = round(mean(dt$CompetitionOpenSinceYear, na.rm = T))\n        dt$Promo2SinceWeek[is.na(dt$Promo2SinceWeek)] = round(mean(dt$Promo2SinceWeek, na.rm = T))\n        dt$Promo2SinceYear[is.na(dt$Promo2SinceYear)] = round(mean(dt$Promo2SinceYear, na.rm = T))\n        dt$Open[is.na(dt$Open)] = round(mean(dt$Open, na.rm = T))\n        \n        # converting to numeric\n        dt$StateHoliday = as.numeric(dt$StateHoliday)\n        dt$StoreType = as.numeric(dt$StoreType)\n        dt$Assortment = as.numeric(dt$Assortment)\n        dt$PromoInterval = as.numeric(dt$PromoInterval)\n        \n        # seperating out the elements of the date column for the dt set\n        dt$Date = as.Date(dt$Date, format = \"%Y-%m-%d\")\n        dt$month <- as.integer(format(dt$Date, \"%m\"))\n        dt$year <- as.integer(format(dt$Date, \"%y\"))\n        dt$day <- as.integer(format(dt$Date, \"%d\"))\n        \n        # removing the date columns (Date not used) (Customers affect simetry) (CompetitionOpenSinceYear not relevant/correlated)\n        dt$Date = NULL\n        dt$Customers = NULL\n        dt$CompetitionOpenSinceYear = NULL\n        \n        return(dt)\n}\n\n\ntrain = ajeita_pa_mim(train)\ntest = ajeita_pa_mim(test)\n\ncor(train)\n\nmod = lm(Sales ~ ., data = train)\n\nsummary(mod)\n\ny = predict(mod, newdata = test)\nmyTest <- predict(mod, newdata = train)\n\nsubmission <- data.frame(Id=test$Id, Sales=y)\ntrain$pred_Sales <- myTest\n\nwrite.csv(submission, \"lm.csv\", row.names = F, quote = F)\nwrite.csv(train, \"Vikas.csv\", row.names = F, quote = F)\nnames(train)\nhead(train, 100)\n",
+    "created" : 1487846440997.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "390757313",
+    "id" : "A9E8D1E",
+    "lastKnownWriteTime" : 1487846836,
+    "last_content_update" : 1487846836023,
+    "path" : "~/ManagerialImplications/simple linear regression.R",
+    "project_path" : "simple linear regression.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

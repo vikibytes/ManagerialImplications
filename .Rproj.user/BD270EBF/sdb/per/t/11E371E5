@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "# 0. Loading required libraries ----\nsource('myLibs.R')\n\n# 1. Let's import datasets ----\n# raw.traindata <- read.csv(file = \"rawData/train.csv\")\n# raw.storedata <- read.csv(file = 'rawData/store.csv')\ntest <- fread(input = \"rawData/test.csv\")\ntrain <- fread(\"rawData/train.csv\")\nstore <- fread(\"rawData/store.csv\")\n\n# 2. Data exploration and cleaning ----\nstr(train)\nstr(test)\n# 2.1 Convert Date column to Date format ----\ntrain[, Date := as.Date(Date)]\ntest[, Date := as.Date(Date)]\nsummary(train)\nsummary(test)\n\n# 2.2 sort data by Date\ntrain <- train[order(Date)]\ntest <- test[order(Date)]\nsummary(train)\n\n#2.3 Checking NA's blanks\nsum(is.na(test$Open))\ntest[is.na(test)] <- 1\n\ntrain[, lapply(.SD, function(x) length(unique(x)))]\ntest[, lapply(.SD, function(x) length(unique(x)))]\n# All test stores are also in the train data\nsum(unique(test$Store) %in% unique(train$Store))\n# 259 train stores are not in the test data\nsum(!(unique(train$Store) %in% unique(test$Store)))\ntable(train$Open) / nrow(train) # Percent Open Train\ntable(test$Open) / nrow(test) # Percent Open Test \ntable(train$Promo) / nrow(train) # Percent of the time promo in train\ntable(test$Promo) / nrow(test) # Percent of the time promo in test\ntable(train$StateHoliday) / nrow(train) # Percent of the time holiday in train\ntable(test$StateHoliday) / nrow(test) # no b and c = no easter holiday and no christmas\ntable(train$SchoolHoliday) / nrow(train) # Percent of the time school holiday in train\ntable(test$SchoolHoliday) / nrow(test) # Percent of the time school holiday in test\nplot(train$Date, type = 'l')\nplot(test$Date, type = \"l\")\n\n# 3. Data Visualization ----\n# 3.1 Mean sales per store when store was not closed ----\nhist(aggregate(train[Sales != 0]$Sales, \n               by = list(train[Sales != 0]$Store), mean)$x, 100, \n     main = \"Mean sales per store when store was not closed\")\n\n# 3.2 Mean customers per store when store was not closed ----\nhist(aggregate(train[Sales != 0]$Customers, \n               by = list(train[Sales != 0]$Store), mean)$x, 100,\n     main = \"Mean customers per store when store was not closed\")\n\n# 3.3 Customers VS Sales ----\n# m <- ggplot(train[train$Sales != 0 & train$Customers != 0],\n#        aes(x = log(Customers), y = log(Sales))) + \n#   geom_point(alpha = 0.2) + geom_smooth()\n# m\n\n\n# Season Plot\ntemp <- train\ntemp$year <- format(temp$Date, \"%Y\")\ntemp$month <- format(temp$Date, \"%m\")\ntemp[, StoreMean := mean(Sales), by = Store]\ntemp <- temp[, .(MonthlySalesMean = mean(Sales / (StoreMean)) * 100), by = .(year, month)]\ntemp <- as.data.frame(temp)\n\nSalesTS <- ts(temp$MonthlySalesMean, start=2013, frequency=12)\ncol = rainbow(3)\nseasonplot(SalesTS, col=col, year.labels.left = TRUE, pch=19, las=1)",
+    "created" : 1486730880683.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2968309866",
+    "id" : "11E371E5",
+    "lastKnownWriteTime" : 1487842884,
+    "last_content_update" : 1487842884462,
+    "path" : "~/ManagerialImplications/ex01.R",
+    "project_path" : "ex01.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
